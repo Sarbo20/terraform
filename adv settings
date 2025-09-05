@@ -1,0 +1,109 @@
+ec2-with existing-sg //sir GitHub
+ 
+firdt do creating instance with terraform
+ 
+ssh-keygen -f rnk-key // outside directory
+<three enter>
+cat rnk-key.pub
+ 
+<copy key>
+ 
+mkdir /something
+cd /someting
+vim file.tf
+ 
+ 
+data "aws_security_group" "web_accessess" {
+ 
+  id = "sg-097f68c03e9c25de9"
+ 
+}
+ 
+#code for elastic ip
+ 
+resource "aws_eip" "sarboit-eip" {
+ 
+  instance = aws_instance.sarbojit-server.id
+ 
+}
+ 
+#inject my ssh-key
+ 
+resource "aws_key_pair" "terra_key" {
+ 
+  key_name   = "terra.key"
+ 
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCdOyEXbGWBDWsL32drbxfRIPPP/td12zEcDouz5xry0HyYBg/Og3p4NApaWeBIRNo6qdXItCLDNDLF4SP1ijgGpvl7pWzVn3PbsjcjqR6+uBSvTiVyAg5tJir6sxawkFLoBNSpgO8hoaODI0h0XfBTdOYmd2l/SMIs8LfG+wFdTakculEvtPtJvnbweXHw3CaGeNKcqU8h2vF7tOlGDUjsYrviYWiCTVSlH+RDkFbO7lr/xNQh200pkABY5YFmSAHLnt6QQ4HJcNlLqrwL543sDnSwrO5oeiUmqj5prb3U9+IlLpF7kWoxf8SKMAQnbALwH7tmmUb7WcanzN+8kpVkU4rzkxuI1/drricxBGd7RbqNNFUXBHuldAt9c+ADjit5KhfSm6pIcu5hF1ynNw8dLylR4vTOyeNjodrpZX5GPqpin8JpYjDvGVAFdxI9KiZ79rOT8vCqg/SfKLtAwgaFISCDRMuuw7FeAft0piNEp26rLe40RW6JfWmRWIXT+WM= root@ter"
+ 
+}
+ 
+resource "aws_instance" "sarbojit-server" {
+ 
+  ami                    = "ami-00ca32bbc84273381"
+ 
+  availability_zone      = "us-east-1a"
+ 
+  instance_type          = "t3.micro"
+ 
+  key_name               = "terra.key"
+ 
+  vpc_security_group_ids = [data.aws_security_group.web_accessess.id]
+ 
+  /* First of generate ssh key and share public ssh key with AWS
+ 
+   and you can execute code*/
+  #root disk
+ 
+  root_block_device {
+ 
+    volume_size           = "25"
+ 
+    volume_type           = "gp2"
+ 
+    delete_on_termination = true
+ 
+  }
+  #additional data disk
+ 
+  ebs_block_device {
+ 
+    device_name           = "/dev/xvdb"
+ 
+    volume_size           = "10"
+ 
+    volume_type           = "gp2"
+ 
+    delete_on_termination = true
+ 
+  }
+  user_data = <<-EOF
+ 
+        #!/bin/bash
+ 
+        sudo yum install httpd -y
+ 
+        sudo systemctl start httpd
+ 
+        sudo systemctl enable httpd
+ 
+        echo "<h1>sample webserver using terraform</h1>" | sudo tee /var/www/html/index.html
+ 
+  EOF
+  tags = {
+ 
+    Name     = "hello-India"
+ 
+    Stage    = "testing"
+ 
+    Location = "India"
+ 
+  }
+ 
+}
+ 
+ 
+terraform init
+terraform validate
+terraform fmt
+terraform plan
+terraform apply
