@@ -1,0 +1,69 @@
+creating instance with terraform:
+ 
+ 
+create an ec2 instance
+connect in terminal
+ 
+sudo yum install -y yum-utils shadow-utils
+ 
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+ 
+sudo yum -y install terraform
+ 
+mkdir /rnk
+cd /rnk
+ 
+ 
+goto aws
+goto iam
+create a user
+attach policy -> administrator access
+get keys ->access and secret key
+vim provider.tf
+ 
+This has to be pasted after vim command
+********************************************************************
+provider "aws" {
+  region     = "us-east-1"
+  access_key = "paste the created key"
+  secret_key = "8avLzHFz78+wa0WpFYZW0rIdEzsHHEkHeVsjyjUr"
+}
+ 
+resource "aws_instance" "my-server" {
+  ami           = "ami-00ca32bbc84273381"
+  instance_type = "t2.micro"
+  tags = {
+    Name = "india-server"
+  }
+}
+*******************************************************************
+inside vim:
+ 
+ami-00ca32bbc84273381
+esc : w q ! enter
+ 
+terraform init
+ 
+yum install tree -y
+tree -a
+terraform validate
+terraform fmt
+terraform plan
+terraform apply
+ 
+goto ec2 
+refresh
+new instance created successfully
+ 
+ 
+select the new instace created
+select tags below
+manage tags
+under value -> change the name to anything
+save
+ 
+goto terminal
+terraform plan 
+terraform apply // the change is showed
+ 
+output= one chnaged
